@@ -2,6 +2,14 @@ import { Trend, TrendCategory } from './types';
 
 export const TRENDS: Trend[] = [
   {
+    id: '90s-film-aesthetic',
+    name: '90s Film Aesthetic',
+    description: 'Capture the essence of a 90s film with a retro, grainy look, romantic atmosphere, and vintage fashion.',
+    prompt: 'Create a retro, vintage-inspired, grainy yet bright image with small sunbeams based on the reference image. Keep the exact same face and hairstyle of the reference person. The man should wear a lightweight garnet shirt, combined with white pants plated in a Pinterest-inspired aesthetic. The atmosphere must capture the essence of a 90s film, in a windy and romantic atmosphere. Standing in the aesthetic street light and reading books while a few leaves blow into the air with dramatic contrasts.',
+    exampleImage: 'https://picsum.photos/seed/90sfilm/500/500',
+    category: TrendCategory.ART,
+  },
+  {
     id: 'lemon-green-fashion',
     name: 'Futuristic Green Outfit',
     description: 'Style yourself in a futuristic fashion editorial with a lemon-green combat jean and oversized sweatshirt.',

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
 import { User, AuthContextType } from './types';
 import * as authService from './services/authService';

@@ -5,6 +5,11 @@ import type { GenerateContentResponse } from "@google/genai";
 let ai: GoogleGenAI | null = null;
 
 function getAiClient(): GoogleGenAI {
+  if (!process.env.API_KEY) {
+    throw new Error(
+      "The API_KEY environment variable is not set. Please make sure to configure it before running the application."
+    );
+  }
   if (!ai) {
     // This will now only be called when the first API request is made,
     // preventing a crash on app load if the API key is missing.

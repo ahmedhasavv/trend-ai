@@ -1,10 +1,9 @@
-
 export enum TrendCategory {
+  FASHION = 'Fashion',
   ART = 'Art',
-  CHARACTERS = 'Characters',
-  POSTER = 'Poster',
-  BACKGROUNDS = 'Backgrounds',
-  FASHION = 'Fashion'
+  NATURE = 'Nature',
+  FUTURISTIC = 'Futuristic',
+  VINTAGE = 'Vintage',
 }
 
 export interface Trend {
@@ -18,16 +17,22 @@ export interface Trend {
 
 export interface GeneratedImage {
   id: string;
-  sourceImage: string; // base64
-  generatedImage: string; // base64
+  sourceImage: string;
+  generatedImage: string;
   trendId: string;
   prompt: string;
   timestamp: number;
 }
 
-export type Theme = 'light' | 'dark';
+export interface User {
+  id: string;
+  email: string | null;
+}
 
-export interface ThemeContextType {
-  theme: Theme;
-  toggleTheme: () => void;
+export interface AuthContextType {
+  user: User | null;
+  loading: boolean;
+  login: (email: string, pass: string) => Promise<void>;
+  logout: () => Promise<void>;
+  signUp: (email: string, pass: string) => Promise<void>;
 }

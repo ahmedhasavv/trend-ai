@@ -1,5 +1,4 @@
-
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { CameraIcon, UploadIcon, XIcon, ImageIcon } from './icons';
 
 interface ImageUploaderProps {
@@ -19,9 +18,15 @@ const CameraCapture: React.FC<{ onCapture: (file: File) => void, onCancel: () =>
                 if (videoRef.current) {
                     videoRef.current.srcObject = stream;
                 }
-            } catch (err) {
+            } catch (err: any) {
                 console.error("Error accessing camera: ", err);
-                alert("Could not access camera. Please ensure permissions are granted.");
+                if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+                    alert("No camera was found. Please ensure a webcam is connected and enabled.");
+                } else if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                    alert("Camera access was denied. Please allow camera permissions in your browser settings to use this feature.");
+                } else {
+                    alert("Could not access camera. Please ensure it's not being used by another application and that permissions are granted.");
+                }
                 onCancel();
             }
         };
@@ -66,7 +71,20 @@ const CameraCapture: React.FC<{ onCapture: (file: File) => void, onCancel: () =>
 const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelect, imagePreviewUrl, clearImage }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
+  const [isCameraAvailable, setIsCameraAvailable] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    // Proactively check for camera availability
+    if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
+      navigator.mediaDevices.enumerateDevices()
+        .then(devices => {
+          const hasCamera = devices.some(device => device.kind === 'videoinput');
+          setIsCameraAvailable(hasCamera);
+        })
+        .catch(() => setIsCameraAvailable(false)); // Assume no camera on error
+    }
+  }, []);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -145,10 +163,12 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelect, imagePrevi
             className="hidden"
             accept="image/png, image/jpeg, image/webp"
         />
-         <button onClick={() => setShowCamera(true)} className="mt-4 flex items-center space-x-2 px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
-            <CameraIcon className="h-5 w-5" />
-            <span>Use Camera</span>
-        </button>
+        {isCameraAvailable && (
+          <button onClick={() => setShowCamera(true)} className="mt-4 flex items-center space-x-2 px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+              <CameraIcon className="h-5 w-5" />
+              <span>Use Camera</span>
+          </button>
+        )}
     </div>
   );
 };

@@ -1,13 +1,18 @@
-
-import React from 'react';
+import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GeneratedImage } from '../types';
 import useLocalStorage from '../hooks/useLocalStorage';
 import { DownloadIcon, ImageIcon } from '../components/icons';
 import { TRENDS } from '../constants';
+import { AuthContext } from '../contexts/AuthContext';
+import { AuthContextType } from '../types';
 
 const GalleryPage: React.FC = () => {
-  const [gallery, setGallery] = useLocalStorage<GeneratedImage[]>('trendai-gallery', []);
+  const { user } = useContext(AuthContext) as AuthContextType;
+  // Make the gallery user-specific by using the user's email in the key
+  const galleryKey = user?.email ? `trendai-gallery-${user.email}` : 'trendai-gallery-guest';
+  const [gallery, setGallery] = useLocalStorage<GeneratedImage[]>(galleryKey, []);
+  
   const navigate = useNavigate();
 
   const sortedGallery = [...gallery].sort((a, b) => b.timestamp - a.timestamp);

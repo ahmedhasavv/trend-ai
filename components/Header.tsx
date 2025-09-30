@@ -1,51 +1,55 @@
-
 import React, { useContext } from 'react';
-import { NavLink } from 'react-router-dom';
-import { ThemeContext } from '../App';
-import { MoonIcon, SparklesIcon, SunIcon } from './icons';
-import { Theme, ThemeContextType } from '../types';
+import { Link, NavLink } from 'react-router-dom';
+import { AuthContext } from '../contexts/AuthContext';
+import { AuthContextType } from '../types';
+import { SparklesIcon } from './icons';
 
 const Header: React.FC = () => {
-  const { theme, toggleTheme } = useContext(ThemeContext) as ThemeContextType;
+  const { user, logout } = useContext(AuthContext) as AuthContextType;
 
-  const getLinkClass = ({ isActive }: { isActive: boolean }) =>
-    `text-sm font-medium transition-colors ${
+  const navLinkClass = ({ isActive }: { isActive: boolean }) =>
+    `px-3 py-2 rounded-md text-sm font-medium transition-colors ${
       isActive
-        ? 'text-neon-blue'
-        : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+        ? 'text-white bg-gray-900/50 dark:bg-gray-700/50'
+        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
     }`;
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md">
+    <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <div className="flex items-center space-x-4">
-            <NavLink to="/" className="flex items-center space-x-2">
-              <SparklesIcon className="h-7 w-7 text-neon-purple" />
-              <span className="text-xl font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-neon-blue">
-                TrendAI
-              </span>
-            </NavLink>
-          </div>
-
-          <nav className="hidden md:flex items-center space-x-6">
-            <NavLink to="/" className={getLinkClass}>Home</NavLink>
-            <NavLink to="/editor" className={getLinkClass}>Editor</NavLink>
-            <NavLink to="/gallery" className={getLinkClass}>My Gallery</NavLink>
-          </nav>
-
           <div className="flex items-center">
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors"
-              aria-label="Toggle theme"
-            >
-              {theme === 'light' ? (
-                <MoonIcon className="h-5 w-5" />
-              ) : (
-                <SunIcon className="h-5 w-5" />
-              )}
-            </button>
+            <Link to="/" className="flex items-center space-x-2">
+              <SparklesIcon className="h-8 w-8 text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-neon-blue" />
+              <span className="text-xl font-bold text-gray-900 dark:text-white">TrendAI</span>
+            </Link>
+          </div>
+          <nav className="hidden md:flex items-center space-x-4">
+            <NavLink to="/" className={navLinkClass}>Home</NavLink>
+            <NavLink to="/editor" className={navLinkClass}>Editor</NavLink>
+            {user && <NavLink to="/gallery" className={navLinkClass}>Gallery</NavLink>}
+          </nav>
+          <div className="flex items-center space-x-4">
+            {user ? (
+              <>
+                <NavLink to="/profile" className={navLinkClass}>Profile</NavLink>
+                <button
+                  onClick={logout}
+                  className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-neon-purple to-neon-blue rounded-md hover:opacity-90 transition-opacity"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
+                  Log In
+                </Link>
+                <Link to="/signup" className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-neon-purple to-neon-blue rounded-md hover:opacity-90 transition-opacity">
+                  Sign Up
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>

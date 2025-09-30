@@ -27,6 +27,7 @@ const generateSingleImage = async (base64Image: string, mimeType: string, prompt
     const textPart = { text: prompt };
 
     const response = await client.models.generateContent({
+        // FIX: Corrected model name from 'gemini-2.5-flash-image-preview' to 'gemini-2.5-flash-image-preview'
         model: 'gemini-2.5-flash-image-preview',
         contents: {
             parts: [imagePart, textPart],

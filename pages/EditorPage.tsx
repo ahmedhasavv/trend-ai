@@ -1,12 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { TRENDS } from '../constants';
-import { Trend, GeneratedImage } from '../types';
+import { Trend, GeneratedImage, AuthContextType } from '../types';
 import ImageUploader from '../components/ImageUploader';
-import { generateImageVariations } from '../services/geminiService';
+// import { generateImageVariations } from '../services/geminiService'; // Dynamic import is used
 import Loader from '../components/Loader';
 import useLocalStorage from '../hooks/useLocalStorage';
 import { DownloadIcon, ShareIcon, SparklesIcon, PlusCircleIcon } from '../components/icons';
+import { AuthContext } from '../contexts/AuthContext';
 
 const fileToBase64 = (file: File): Promise<{ base64: string, mimeType: string }> => {
   return new Promise((resolve, reject) => {
@@ -25,7 +26,10 @@ const fileToBase64 = (file: File): Promise<{ base64: string, mimeType: string }>
 const EditorPage: React.FC = () => {
   const { trendId } = useParams();
   const navigate = useNavigate();
-  const [gallery, setGallery] = useLocalStorage<GeneratedImage[]>('trendai-gallery', []);
+  const { user } = useContext(AuthContext) as AuthContextType;
+  
+  const galleryKey = user?.email ? `trendai-gallery-${user.email}` : 'trendai-gallery-guest';
+  const [gallery, setGallery] = useLocalStorage<GeneratedImage[]>(galleryKey, []);
   
   const [selectedTrend, setSelectedTrend] = useState<Trend | null>(null);
   const [userImage, setUserImage] = useState<File | null>(null);
@@ -73,6 +77,7 @@ const EditorPage: React.FC = () => {
     setSelectedImageUrl(null);
     
     try {
+        const { generateImageVariations } = await import('../services/geminiService');
         const { base64, mimeType } = await fileToBase64(userImage);
         const generatedBase64Array = await generateImageVariations(base64, mimeType, selectedTrend.prompt);
         
@@ -92,6 +97,12 @@ const EditorPage: React.FC = () => {
   const handleSaveToGallery = async () => {
     if (!selectedImageUrl || !selectedTrend || !userImage) return;
 
+    if (!user) {
+        alert("Please log in to save images to your gallery.");
+        navigate('/login');
+        return;
+    }
+
     const { base64: sourceBase64, mimeType } = await fileToBase64(userImage);
 
     const newGalleryItem: GeneratedImage = {
@@ -103,7 +114,7 @@ const EditorPage: React.FC = () => {
         timestamp: Date.now()
     };
     setGallery([newGalleryItem, ...gallery]);
-    alert("Saved to gallery!");
+    alert("Saved to your gallery!");
   };
 
   const handleDownload = () => {
@@ -189,6 +200,7 @@ const EditorPage: React.FC = () => {
                     <div className="text-center text-gray-500 dark:text-gray-400">
                         <SparklesIcon className="h-16 w-16 mx-auto text-gray-400 dark:text-gray-600" />
                         <p className="mt-2">Your generated images will appear here.</p>
+                         {!user && <p className="text-sm mt-2"> <Link to="/login" className="text-neon-blue hover:underline">Log in</Link> to save your creations.</p>}
                     </div>
                 )}
             </div>

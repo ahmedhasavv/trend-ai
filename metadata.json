@@ -1,5 +1,5 @@
 {
-  "name": "Copy of TrendAI",
+  "name": "Copy of Copy of TrendAI",
   "description": "An AI-powered trend image generator. Users select a ready-made, daily-updated prompt, upload their own photo, and the application generates a new image that matches the trend's style.",
   "requestFramePermissions": [
     "camera"
